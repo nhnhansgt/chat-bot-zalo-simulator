@@ -8,8 +8,8 @@ import {
   ERROR_MESSAGES,
   EVENT_NAME,
   MAX_MESSAGE_LENGTH,
-} from '../config/constants.js';
-import { generateSignature } from '../utils/signature.js';
+} from "../config/constants.js";
+import { generateSignature } from "../utils/signature.js";
 
 /**
  * Service for communicating with the Zalo OA webhook backend
@@ -96,7 +96,7 @@ export class WebhookService {
    */
   async sendMessage(messageText) {
     // Validate input
-    if (!messageText || typeof messageText !== 'string') {
+    if (!messageText || typeof messageText !== "string") {
       throw new Error(ERROR_MESSAGES.EMPTY_MESSAGE);
     }
 
@@ -118,8 +118,8 @@ export class WebhookService {
     try {
       signature = await this._generateSignature(payload);
     } catch (error) {
-      console.error('[WebhookService] Signature generation failed:', error);
-      throw new Error('Loi khi tao chu ky xac thuc.');
+      console.error("[WebhookService] Signature generation failed:", error);
+      throw new Error("Loi khi tao chu ky xac thuc.");
     }
 
     // Create abort controller for timeout
@@ -129,10 +129,12 @@ export class WebhookService {
     try {
       // Send request to backend
       const response = await fetch(this.webhookUrl, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'X-ZEvent-Signature': signature,
+          "Content-Type": "application/json",
+          "X-ZEvent-Signature": signature,
+          "Bypass-Tunnel-Reminder": "true", // Bypass localtunnel warning
+          "ngrok-skip-browser-warning": "true", // Bypass ngrok warning
         },
         body: JSON.stringify(payload),
         signal: controller.signal,
@@ -148,17 +150,21 @@ export class WebhookService {
           errorData = await response.json();
         } catch {
           // If not JSON, use status text
-          throw new Error(`${ERROR_MESSAGES.SERVER_ERROR} (HTTP ${response.status})`);
+          throw new Error(
+            `${ERROR_MESSAGES.SERVER_ERROR} (HTTP ${response.status})`
+          );
         }
 
         // Handle specific error codes
         switch (response.status) {
           case 400:
-            throw new Error(errorData.message || ERROR_MESSAGES.INVALID_RESPONSE);
+            throw new Error(
+              errorData.message || ERROR_MESSAGES.INVALID_RESPONSE
+            );
           case 401:
-            throw new Error('Thieu chu ky xac thuc.');
+            throw new Error("Thieu chu ky xac thuc.");
           case 403:
-            throw new Error('Chu ky xac thuc khong hop le.');
+            throw new Error("Chu ky xac thuc khong hop le.");
           case 500:
             throw new Error(ERROR_MESSAGES.SERVER_ERROR);
           default:
@@ -175,7 +181,7 @@ export class WebhookService {
       }
 
       if (!data.data || !data.data.message || !data.data.message.text) {
-        console.error('[WebhookService] Invalid response structure:', data);
+        console.error("[WebhookService] Invalid response structure:", data);
         throw new Error(ERROR_MESSAGES.INVALID_RESPONSE);
       }
 
@@ -184,12 +190,12 @@ export class WebhookService {
       clearTimeout(timeoutId);
 
       // Handle timeout
-      if (error.name === 'AbortError') {
+      if (error.name === "AbortError") {
         throw new Error(ERROR_MESSAGES.TIMEOUT_ERROR);
       }
 
       // Handle network errors
-      if (error instanceof TypeError && error.message.includes('fetch')) {
+      if (error instanceof TypeError && error.message.includes("fetch")) {
         throw new Error(ERROR_MESSAGES.NETWORK_ERROR);
       }
 
@@ -209,9 +215,9 @@ export class WebhookService {
       const timeoutId = setTimeout(() => controller.abort(), 5000);
 
       // Use health check endpoint if available, otherwise send test message
-      const healthUrl = this.webhookUrl.replace('/webhook', '/health');
+      const healthUrl = this.webhookUrl.replace("/webhook", "/health");
       const response = await fetch(healthUrl, {
-        method: 'GET',
+        method: "GET",
         signal: controller.signal,
       });
 
@@ -219,7 +225,7 @@ export class WebhookService {
 
       return response.ok;
     } catch (error) {
-      console.warn('[WebhookService] Health check failed:', error.message);
+      console.warn("[WebhookService] Health check failed:", error.message);
       return false;
     }
   }
