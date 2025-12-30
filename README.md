@@ -23,14 +23,26 @@ chatbot-zalo-simulator/
 │   │   ├── routes/         # Webhook endpoint handler
 │   │   ├── services/       # Gemini AI integration
 │   │   └── utils/          # Signature utilities
-│   └── package.json
-├── src/                    # React frontend
-│   ├── components/         # React components
-│   ├── hooks/             # Custom React hooks
-│   ├── services/          # API client services
-│   ├── utils/             # Frontend utilities
-│   └── config/            # Frontend configuration
-└── package.json
+│   ├── package.json
+│   └── .env.example
+├── zalo/                    # React frontend
+│   ├── src/
+│   │   ├── components/     # React components
+│   │   ├── hooks/          # Custom React hooks
+│   │   ├── services/       # API client services
+│   │   ├── utils/          # Frontend utilities
+│   │   ├── config/         # Frontend configuration
+│   │   ├── App.jsx         # Main application component
+│   │   ├── main.jsx        # Entry point
+│   │   └── index.css       # Global styles
+│   ├── package.json
+│   ├── vite.config.js
+│   ├── index.html
+│   └── .env.example
+├── .env.example             # Root environment template
+├── package.json             # Monorepo workspace configuration
+├── README.md
+└── CHANGELOG.md
 ```
 
 ## Installation
@@ -49,28 +61,26 @@ chatbot-zalo-simulator/
    cd ChatbotZaloSimulator
    ```
 
-2. **Install frontend dependencies**:
+2. **Install all dependencies** (recommended):
    ```bash
+   npm run install:all
+   ```
+
+   Or install separately:
+   ```bash
+   # Root dependencies
    npm install
+
+   # Backend dependencies
+   cd backend && npm install && cd ..
+
+   # Frontend dependencies
+   cd zalo && npm install && cd ..
    ```
 
-3. **Install backend dependencies**:
-   ```bash
-   cd backend && npm install
-   ```
+3. **Configure environment variables**:
 
-4. **Configure environment variables**:
-
-   **Frontend (.env)**:
-   ```bash
-   VITE_WEBHOOK_URL=http://localhost:3001/webhook
-   VITE_APP_ID=demo_app_id
-   VITE_USER_ID=demo_user_123
-   VITE_OA_ID=demo_oa_987
-   VITE_SECRET_KEY=demo_secret_key_change_in_production
-   ```
-
-   **Backend (backend/.env)**:
+   **Backend (`backend/.env`)**:
    ```bash
    PORT=3001
    NODE_ENV=development
@@ -81,7 +91,16 @@ chatbot-zalo-simulator/
    CORS_ORIGIN=http://localhost:5173
    ```
 
-5. **Get a Google Gemini API Key**:
+   **Frontend (`zalo/.env`)**:
+   ```bash
+   VITE_WEBHOOK_URL=http://localhost:3001/webhook
+   VITE_APP_ID=demo_app_id
+   VITE_USER_ID=demo_user_123
+   VITE_OA_ID=demo_oa_987
+   VITE_SECRET_KEY=demo_secret_key_change_in_production
+   ```
+
+4. **Get a Google Gemini API Key**:
    - Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
    - Create a new API key
    - Add it to `backend/.env`
@@ -94,14 +113,14 @@ Run both frontend and backend:
 
 ```bash
 # Run both together (recommended)
-npm run dev:all
+npm run dev
 
 # Or run separately
 # Terminal 1: Backend
-cd backend && npm start
+npm run dev:backend
 
 # Terminal 2: Frontend
-npm run dev
+npm run dev:frontend
 ```
 
 ### Access the Application

@@ -1,102 +1,112 @@
-import React, { useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { MAX_MESSAGE_LENGTH } from '../config/constants.js';
 
-// Sticker icon
-const StickerIcon = () => (
-  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#6B7280" strokeWidth="2">
-    <rect x="3" y="3" width="18" height="18" rx="2"/>
-    <circle cx="8.5" cy="9.5" r="1.5" fill="currentColor" stroke="none"/>
-    <circle cx="15.5" cy="9.5" r="1.5" fill="currentColor" stroke="none"/>
-    <path d="M8 14s1.5 2 4 2 4-2 4-2" strokeLinecap="round"/>
-  </svg>
-);
+/**
+ * ChatInput component - Message input field with send button
+ *
+ * @param {object} props - Component props
+ * @param {Function} props.onSendMessage - Callback when message is sent
+ * @param {boolean} props.disabled - Whether input is disabled
+ * @param {string} [props.placeholder] - Input placeholder text
+ */
+export function ChatInput({ onSendMessage, disabled = false, placeholder = 'Nhap tin nhan...' }) {
+  const [inputValue, setInputValue] = useState('');
+  const inputRef = useRef(null);
 
-// Image icon
-const ImageIcon = () => (
-  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#6B7280" strokeWidth="2">
-    <rect x="3" y="3" width="18" height="18" rx="2"/>
-    <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" stroke="none"/>
-    <path d="M21 15l-5-5L5 21" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
+  /**
+   * Handles form submission
+   *
+   * @param {React.FormEvent} e - Form event
+   */
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-// Attachment icon
-const AttachmentIcon = () => (
-  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#6B7280" strokeWidth="2">
-    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
-  </svg>
-);
+    const trimmedValue = inputValue.trim();
 
-// Send icon
-const SendIcon = () => (
-  <svg viewBox="0 0 24 24" width="20" height="20" fill="white">
-    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-  </svg>
-);
+    // Check if input is empty
+    if (!trimmedValue) {
+      return;
+    }
 
-const ChatInput = ({ onSend, disabled }) => {
-  const textareaRef = useRef(null);
+    // Check length limit
+    if (trimmedValue.length > MAX_MESSAGE_LENGTH) {
+      alert(`Tin nhan qua dai (toi da ${MAX_MESSAGE_LENGTH} ky tu).`);
+      return;
+    }
 
+    // Send message
+    onSendMessage(trimmedValue);
+
+    // Clear input
+    setInputValue('');
+  };
+
+  /**
+   * Handles keyboard shortcuts
+   *
+   * @param {React.KeyboardEvent} e - Keyboard event
+   */
   const handleKeyDown = (e) => {
+    // Send message on Enter (without Shift)
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      const text = textareaRef.current.value.trim();
-      if (text && !disabled) {
-        onSend(text);
-        textareaRef.current.value = '';
-        textareaRef.current.style.height = 'auto';
-      }
+      handleSubmit(e);
     }
   };
 
-  const handleInputChange = () => {
-    const textarea = textareaRef.current;
-    textarea.style.height = 'auto';
-    textarea.style.height = Math.min(textarea.scrollHeight, 100) + 'px';
-  };
-
-  const handleSendClick = () => {
-    const text = textareaRef.current.value.trim();
-    if (text && !disabled) {
-      onSend(text);
-      textareaRef.current.value = '';
-      textareaRef.current.style.height = 'auto';
-    }
-  };
+  // Focus input on mount
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
   return (
-    <footer className="chat-footer">
-      <div className="action-buttons">
-        <button className="action-btn" title="Gửi Sticker">
-          <StickerIcon />
-        </button>
-        <button className="action-btn" title="Gửi ảnh">
-          <ImageIcon />
-        </button>
-        <button className="action-btn" title="Đính kèm file">
-          <AttachmentIcon />
-        </button>
-      </div>
-      <div className="input-container">
-        <textarea
-          ref={textareaRef}
-          className="message-input"
-          placeholder="Nhập tin nhắn..."
-          rows="1"
+    <div className="chat-input-container">
+      <form onSubmit={handleSubmit} className="chat-input-form">
+        <input
+          ref={inputRef}
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          onChange={handleInputChange}
+          placeholder={placeholder}
           disabled={disabled}
+          maxLength={MAX_MESSAGE_LENGTH}
+          className="chat-input-field"
+          autoComplete="off"
         />
-      </div>
-      <button
-        className="send-button"
-        onClick={handleSendClick}
-        disabled={disabled}
-        title="Gửi tin nhắn"
-      >
-        <SendIcon />
-      </button>
-    </footer>
-  );
-};
 
-export default ChatInput;
+        <button
+          type="submit"
+          disabled={disabled || !inputValue.trim()}
+          className="chat-send-button"
+          aria-label="Gui tin nhan"
+        >
+          {disabled ? (
+            <span className="sending-indicator">...</span>
+          ) : (
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M18.5 2.5L9.5 17.5M18.5 2.5L12.5 17.5M18.5 2.5L2.5 9.5L9.5 11.5L12.5 17.5L18.5 2.5Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          )}
+        </button>
+      </form>
+
+      {/* Character counter */}
+      <div className="chat-input-counter">
+        {inputValue.length} / {MAX_MESSAGE_LENGTH}
+      </div>
+    </div>
+  );
+}

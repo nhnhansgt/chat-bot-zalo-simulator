@@ -1,49 +1,56 @@
-import React from 'react';
+import { MESSAGE_TYPE } from '../config/constants.js';
 
-// Zalo logo icon component
-const ZaloIcon = () => (
-  <svg viewBox="0 0 24 24" width="20" height="20" fill="white">
-    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-  </svg>
-);
+/**
+ * Message component - Displays a single chat message bubble
+ *
+ * @param {object} props - Component props
+ * @param {object} props.message - Message object
+ * @param {string} props.message.id - Unique message ID
+ * @param {string} props.message.text - Message text content
+ * @param {'user'|'bot'|'system'} props.message.sender - Message sender type
+ * @param {number} props.message.timestamp - Unix timestamp
+ * @param {boolean} [props.message.isError] - Whether this is an error message
+ */
+export function Message({ message }) {
+  const { text, sender, timestamp, isError } = message;
 
-// Message bubble component
-const MessageBubble = ({ type, textLines, timestamp, userInitial = 'B' }) => {
-  const isBot = type === 'bot';
+  // Format timestamp
+  const formatTime = (ts) => {
+    const date = new Date(ts);
+    return date.toLocaleTimeString('vi-VN', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  // Determine message style based on sender
+  const getMessageClass = () => {
+    if (isError) {
+      return 'message-error';
+    }
+    if (sender === MESSAGE_TYPE.USER) {
+      return 'message-user';
+    }
+    if (sender === MESSAGE_TYPE.BOT) {
+      return 'message-bot';
+    }
+    return 'message-system';
+  };
 
   return (
-    <div className={`message ${type}`}>
-      <div className={`avatar ${isBot ? 'zalo' : 'user'}`}>
-        {isBot ? <ZaloIcon /> : <span>{userInitial}</span>}
-      </div>
-      <div className="bubble">
-        <div className="bubble-text">
-          {textLines.map((line, index) => (
-            <div key={index} className="bubble-text-line">
-              {line}
-            </div>
-          ))}
-        </div>
-        <span className="timestamp">{timestamp}</span>
+    <div className={`message ${getMessageClass()}`}>
+      <div className="message-content">
+        {/* Sender indicator for bot messages */}
+        {sender === MESSAGE_TYPE.BOT && !isError && (
+          <div className="message-sender">Zalo OA</div>
+        )}
+
+        {/* Message text */}
+        <div className="message-text">{text}</div>
+
+        {/* Timestamp */}
+        <div className="message-time">{formatTime(timestamp)}</div>
       </div>
     </div>
   );
-};
-
-// Typing indicator component
-export const TypingIndicator = () => (
-  <div className="message bot">
-    <div className="avatar zalo">
-      <ZaloIcon />
-    </div>
-    <div className="bubble">
-      <div className="typing-indicator">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-    </div>
-  </div>
-);
-
-export default MessageBubble;
+}

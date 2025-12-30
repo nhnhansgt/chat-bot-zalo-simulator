@@ -1,35 +1,54 @@
-import React from 'react';
-
-// Back arrow icon
-const BackIcon = () => (
-  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="white" strokeWidth="2.5">
-    <path d="M19 12H5M12 19L5 12L12 5" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-
-// Three dots menu icon
-const MoreIcon = () => (
-  <svg viewBox="0 0 24 24" width="22" height="22" fill="white">
-    <circle cx="12" cy="5" r="2"/>
-    <circle cx="12" cy="12" r="2"/>
-    <circle cx="12" cy="19" r="2"/>
-  </svg>
-);
-
-const ChatHeader = ({ title }) => {
+/**
+ * ChatHeader component - Displays chat header with title and status
+ *
+ * @param {object} props - Component props
+ * @param {boolean} props.isTyping - Whether bot is currently typing
+ * @param {string} [props.title] - Chat title
+ * @param {string} [props.subtitle] - Chat subtitle/status text
+ */
+export function ChatHeader({ isTyping = false, title = 'Zalo OA Chatbot', subtitle = 'Simulator' }) {
   return (
-    <header className="chat-header">
-      <div className="header-left">
-        <div className="back-button">
-          <BackIcon />
-        </div>
-        <span className="header-title">{title}</span>
+    <div className="chat-header">
+      {/* Avatar */}
+      <div className="chat-header-avatar">
+        <div className="avatar-placeholder">OA</div>
+        {/* Online status indicator */}
+        <div className="avatar-status online" />
       </div>
-      <div className="header-right">
-        <MoreIcon />
-      </div>
-    </header>
-  );
-};
 
-export default ChatHeader;
+      {/* Title and status */}
+      <div className="chat-header-info">
+        <h1 className="chat-header-title">{title}</h1>
+        <p className="chat-header-status">
+          {isTyping ? (
+            <>
+              <span className="typing-indicator">
+                <span className="typing-dot" />
+                <span className="typing-dot" />
+                <span className="typing-dot" />
+              </span>
+              {' Dang nhap tin...'}
+            </>
+          ) : (
+            <>{subtitle}</>
+          )}
+        </p>
+      </div>
+
+      {/* Menu button (placeholder for future features) */}
+      <button className="chat-header-menu" aria-label="Menu">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 20 20"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle cx="10" cy="10" r="1.5" fill="currentColor" />
+          <circle cx="10" cy="5" r="1.5" fill="currentColor" />
+          <circle cx="10" cy="15" r="1.5" fill="currentColor" />
+        </svg>
+      </button>
+    </div>
+  );
+}

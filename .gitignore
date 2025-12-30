@@ -16,6 +16,7 @@ pnpm-debug.log*
 .env.local
 .env.*.local
 backend/.env
+zalo/.env
 
 # Editor directories and files
 .vscode/*
@@ -31,7 +32,11 @@ backend/.env
 # Build output
 dist/
 dist-ssr/
+zalo/dist/
 *.local
+
+# Vite
+.vite/
 
 # Logs
 logs

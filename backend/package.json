@@ -1,5 +1,5 @@
 {
-  "name": "chatbot-zalo-simulator-backend",
+  "name": "@chatbot-zalo-simulator/backend",
   "version": "1.0.0",
   "description": "Backend server for Zalo OA Chatbot Webhook Simulator",
   "main": "src/index.js",
