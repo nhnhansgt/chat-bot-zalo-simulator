@@ -1,0 +1,30 @@
+{
+  "name": "chatbot-zalo-simulator-backend",
+  "version": "1.0.0",
+  "description": "Backend server for Zalo OA Chatbot Webhook Simulator",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "echo \"Tests not yet implemented\" && exit 0"
+  },
+  "keywords": [
+    "zalo",
+    "chatbot",
+    "webhook",
+    "gemini-ai"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
